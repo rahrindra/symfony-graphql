@@ -1,0 +1,6 @@
+graphqlite:
+    namespace:
+        controllers: App\\GraphQL\\Controller\\
+        types:
+            - App\\GraphQL\\Type\\
+            - App\\Entity\\

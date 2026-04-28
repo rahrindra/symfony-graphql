@@ -37,7 +37,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * @psalm-type ArgumentsType = list<mixed>|array<string, mixed>
  * @psalm-type CallType = array<string, ArgumentsType>|array{0:string, 1?:ArgumentsType, 2?:bool}|array{method:string, arguments?:ArgumentsType, returns_clone?:bool}
  * @psalm-type TagsType = list<string|array<string, array<string, mixed>>> // arrays inside the list must have only one element, with the tag name as the key
- * @psalm-type CallbackType = string|array{0:string|ReferenceConfigurator,1:string}|\Closure|ReferenceConfigurator
+ * @psalm-type CallbackType = string|array{0:string|ReferenceConfigurator,1:string}|\Closure|ReferenceConfigurator|ExpressionConfigurator
  * @psalm-type DeprecationType = array{package: string, version: string, message?: string}
  * @psalm-type DefaultsType = array{
  *     public?: bool,
@@ -299,7 +299,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         },
  *     },
  *     translator?: bool|array{ // Translator configuration
- *         enabled?: bool|Param, // Default: false
+ *         enabled?: bool|Param, // Default: true
  *         fallbacks?: list<scalar|Param|null>,
  *         logging?: bool|Param, // Default: false
  *         formatter?: scalar|Param|null, // Default: "translator.formatter.default"
@@ -327,7 +327,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         }>,
  *     },
  *     validation?: bool|array{ // Validation configuration
- *         enabled?: bool|Param, // Default: false
+ *         enabled?: bool|Param, // Default: true
  *         enable_attributes?: bool|Param, // Default: true
  *         static_method?: list<scalar|Param|null>,
  *         translation_domain?: scalar|Param|null, // Default: "validators"
@@ -723,12 +723,33 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     intercept_redirects?: bool|Param, // Default: false
  *     excluded_ajax_paths?: scalar|Param|null, // Default: "^/((index|app(_[\\w]+)?)\\.php/)?_wdt"
  * }
+ * @psalm-type GraphqliteConfig = array{ // Read more about GraphQLite available options at: https://graphqlite.thecodingmachine.io/docs/symfony-bundle
+ *     namespace?: array{
+ *         controllers?: list<scalar|Param|null>,
+ *         types?: list<scalar|Param|null>,
+ *     },
+ *     debug?: array{
+ *         INCLUDE_DEBUG_MESSAGE?: bool|Param, // Include exception messages in output when an error arises // Default: false
+ *         INCLUDE_TRACE?: bool|Param, // Include stacktrace in output when an error arises // Default: false
+ *         RETHROW_INTERNAL_EXCEPTIONS?: bool|Param, // Exceptions are not caught by the engine and propagated to Symfony // Default: false
+ *         RETHROW_UNSAFE_EXCEPTIONS?: bool|Param, // Exceptions that do not implement ClientAware interface are not caught by the engine and propagated to Symfony. // Default: true
+ *     },
+ *     security?: array{
+ *         enable_login?: "on"|"off"|"auto"|Param, // Enable to automatically create a login/logout mutation. "on": enable, "auto": enable if security bundle is available. // Default: "auto"
+ *         enable_me?: "on"|"off"|"auto"|Param, // Enable to automatically create a "me" query to fetch the current user. "on": enable, "auto": enable if security bundle is available. // Default: "auto"
+ *         introspection?: bool|Param, // Allow the introspection of the GraphQL API. // Default: true
+ *         maximum_query_complexity?: int|Param, // Define a maximum query complexity value.
+ *         maximum_query_depth?: int|Param, // Define a maximum query depth value.
+ *         firewall_name?: scalar|Param|null, // The name of the firewall to use for login // Default: "main"
+ *     },
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
  *     services?: ServicesConfig,
  *     framework?: FrameworkConfig,
  *     twig?: TwigConfig,
+ *     graphqlite?: GraphqliteConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -736,6 +757,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         framework?: FrameworkConfig,
  *         twig?: TwigConfig,
  *         web_profiler?: WebProfilerConfig,
+ *         graphqlite?: GraphqliteConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -743,6 +765,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         services?: ServicesConfig,
  *         framework?: FrameworkConfig,
  *         twig?: TwigConfig,
+ *         graphqlite?: GraphqliteConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -751,6 +774,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         framework?: FrameworkConfig,
  *         twig?: TwigConfig,
  *         web_profiler?: WebProfilerConfig,
+ *         graphqlite?: GraphqliteConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,
